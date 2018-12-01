@@ -28,7 +28,7 @@ Autoencoder는 neural network 모델의 한 종류이며, input data를 받았�
 Autoencoder는 크게 네 부분으로 나눌 수 있습니다. <br/>
 * mapping layer (= encoder) 
 * bottleneck layer
- * de-mapping layer (=decoder)
+* demapping layer (=decoder)
 * output layer
 
 <br/>
