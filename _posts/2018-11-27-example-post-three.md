@@ -45,54 +45,170 @@ Autoencoder의 이러한 reconstruction error는 데이터의 outlier를 잡아�
 
 
 
-<h4> Average 거리를 이용한 코드예시 </h4>
+<h4> 코드 </h4>
 
 ```python
-from sklearn.datasets import load_digits
+import os, sys
+from matplotlib import pyplot as plt
+from sklearn import datasets
 import numpy as np
-## 1 ############################################################################################
-def k_neighbor_novelty_score(from_point, to_points, k):
-    if len(to_points) != k:
-        raise
-    all_dists = 0
-    for each_to_point in to_points:
-        each_dist = np.sqrt(np.sum((from_point - each_to_point)**2))
-        all_dists += each_dist
-    novelty_score = np.round(all_dists/k)
-    return novelty_score
-## 2 ############################################################################################
-input_digits, target_labels = load_digits(n_class=10, return_X_y=True)
-num_data = 101
-k = 100
-input_digits = input_digits[:num_data]
-target_labels = target_labels[:num_data]
-novelty_scores = [0]*num_data
-for outer_idx in np.arange(num_data):
-    novelty_scores[outer_idx] = k_neighbor_novelty_score(input_digits[outer_idx], [element for inner_idx, element in enumerate(input_digits) if inner_idx != outer_idx], k)
-## 3 ############################################################################################
-print(novelty_scores)
-# Read data and set some threshold
-threshold = 50
-outliers = [idx for idx, element in enumerate(novelty_scores) if element > threshold]
-print(outliers)
+import tensorflow as tf
+
+
+
+### Build autoencoder model
+class Autoencoder():
+    def __init__(self, MODEL_DIR, mini_batch_size, learning_rate, num_epoch, num_encoder_decoder_nodes, num_latent_nodes):
+        self.MODEL_DIR = os.path.abspath(MODEL_DIR)
+        self.mini_batch_size = mini_batch_size
+        self.learning_rate = learning_rate
+        self.num_epoch = num_epoch
+        self.num_encoder_decoder_nodes = num_encoder_decoder_nodes
+        self.num_latent_nodes = num_latent_nodes
+        # Other params
+        self.weight_initializer = tf.contrib.layers.xavier_initializer()
+        self.MODEL_CKPT = os.path.join(self.MODEL_DIR, "model.ckpt")
+        self.each_epoch_loss = 0.0
+        return
+
+    def __prepare_data(self):
+        ### Import dataset
+        # Take only 2 features from original 30-dimensional data
+        self.X = datasets.load_breast_cancer().data[:,:2]
+        # Change dtype into float32
+        self.X = self.X.astype(np.float32)
+
+        ### Shuffle data
+        np.random.shuffle(self.X)
+
+        ### Split data into train and test set
+        num_X = self.X.shape[0]
+        # Use 80% of data as train set
+        self.num_train_X = np.int(num_X*0.8)
+        self.train_X = self.X[:self.num_train_X, :]
+
+        ### Mini batch index
+        self.mini_batch_idx = 0
+        return
+
+    def __generate_mini_batch(self):
+        # Generate data with mini batch size
+        if self.mini_batch_idx >= self.num_train_X:
+            self.mini_batch_idx = 0
+        mini_batch_X = self.train_X[self.mini_batch_idx:self.mini_batch_idx+self.mini_batch_size, :]
+        self.mini_batch_idx += self.mini_batch_size
+        return mini_batch_X
+
+    def __build_model(self):
+        # Input (and target)
+        self.input = tf.placeholder(dtype=tf.float32, shape=[None, 2])
+        # Encoder layer
+        # encoder_output shape: [None, self.num_encoder_decoder_nodes]
+        encoder_output = tf.layers.dense(inputs=self.input,
+                                         units=self.num_encoder_decoder_nodes,
+                                         kernel_initializer=self.weight_initializer)
+        # Latent layer
+        # latent_output shape: [None, self.num_latent_nodes]
+        latent_output = tf.layers.dense(inputs=encoder_output,
+                                        units=self.num_latent_nodes,
+                                        activation=tf.nn.sigmoid,
+                                        kernel_initializer=self.weight_initializer)
+        # Decoder layer
+        # decoder_output shape: [None, self.num_encoder_decoder_nodes]
+        decoder_output = tf.layers.dense(inputs=latent_output,
+                                         units=self.num_encoder_decoder_nodes,
+                                         activation=tf.nn.sigmoid,
+                                         kernel_initializer=self.weight_initializer)
+        # Output layer
+        # logit_shape: [None, 2]
+        self.logits = tf.layers.dense(inputs=decoder_output,
+                                      units=2,
+                                      kernel_initializer=self.weight_initializer)
+        # Loss
+        self.loss = tf.losses.mean_squared_error(labels=self.input, predictions=self.logits)
+        # Global step
+        self.global_step = tf.train.get_or_create_global_step()
+        # Optimizer
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(loss=self.loss,
+                                                                                           global_step=self.global_step)
+        # Model saver
+        self.saver = tf.train.Saver()
+        return
+
+    def train(self):
+        # Create data
+        self.__prepare_data()
+        # Build model graph
+        self.__build_model()
+        # Run the model
+        with tf.Session() as sess:
+            # If the model exists, load it
+            if tf.train.checkpoint_exists(checkpoint_prefix=self.MODEL_CKPT):
+                LATEST_CKPT = tf.train.latest_checkpoint(checkpoint_dir=self.MODEL_DIR)
+                self.saver.restore(sess, LATEST_CKPT)
+                print('Latest checkpoint restored')
+            # Create new model
+            else:
+                global_initializer = tf.global_variables_initializer()
+                sess.run(global_initializer)
+                print('New model created')
+            # Train the model
+            for each_epoch in range(self.num_epoch):
+                for each_step in range(self.num_train_X):
+                    # Get train data with mini batch size
+                    mini_batch_X = self.__generate_mini_batch()
+                    # Calculate loss and update the model
+                    each_step_loss, _ = sess.run([self.loss, self.optimizer], feed_dict={self.input: mini_batch_X})
+                    self.each_epoch_loss += each_step_loss
+                print("Epoch: {}       Loss: {}".format(each_epoch+1, self.each_epoch_loss/self.num_train_X))
+                self.each_epoch_loss = 0
+                # Save the model every 10 epochs
+                if (each_epoch+1) % 10 == 0:
+                    self.saver.save(sess, self.MODEL_CKPT, global_step=self.global_step)
+                    print('Model saved')
+        return
+
+    # Plot normal and novel data
+    def __plot(self, predict_reconstruction_errors):
+        predict_reconstruction_errors = np.array(predict_reconstruction_errors)
+        # If reconstruction error is not over specific value, the data is normal
+        normal_data_idx = np.where(predict_reconstruction_errors <= 45)
+        # If reconstruction error is over specific value, the data is novel
+        abnormal_data_idx = np.where(predict_reconstruction_errors > 45)
+        normal_data = self.X[normal_data_idx]
+        abnormal_data = self.X[abnormal_data_idx]
+        plt.scatter(normal_data[:, 0], normal_data[:,1], c='b')
+        plt.scatter(abnormal_data[:, 0], abnormal_data[:, 1], c='r')
+        plt.show()
+        return
+
+    def predict(self):
+        # Create data
+        self.__prepare_data()
+        # Build model graph
+        self.__build_model()
+        # Run the model
+        with tf.Session() as sess:
+            # Dummy list
+            predict_reconstruction_errors = []
+            # Load model
+            LATEST_CKPT = tf.train.latest_checkpoint(checkpoint_dir=self.MODEL_DIR)
+            self.saver.restore(sess, LATEST_CKPT)
+            print('Latest checkpoint restored')
+            # Test model
+            for each_step in range(self.X.shape[0]):
+                each_step_loss = sess.run(self.loss, feed_dict={self.input: self.X[each_step, :].reshape(-1, 2)})
+                predict_reconstruction_errors.append(each_step_loss)
+        # Plot the result
+        self.__plot(predict_reconstruction_errors)
+        return
+
+# Load trained model and detect novel data
+autoencoder = Autoencoder('./model', 32, 0.01, 50, 500, 100)
+autoencoder.predict()
 ```
 
-
-
-<h4> 코드 설명 </h4>
-
-1. def k_neighbor_novelty_score(from_point, to_points): <br/>
-함수는 한 점과(from_point), 그 점을 제외한 k개의 점을(to_points) 인풋으로 받습니다. <br/>
-from_point-to_points간의 평균 거리를 바탕으로, from_point의 to_points에 대한 novelty score을 반환합니다.
-2. 101개의 숫자데이터(각각이 pixels를 담고 있는 record)를 로드하고, <br/>
-각각의 데이터를 하나하나 looping하면서 각 데이터별, 자신을 제외한 k=100 이웃과의 novelty score을 계산하여 순서대로 쌓습니다.
-3. 누적된 novelty score을 뽑아보고 임의의 임계값을 정하여 outliers를 골라냅니다.
-
-
-
-
-
-<br><br><br><br/><br/><br/>
+<br/><br/><br/>
 <h2> One-class SupportVector Machine </h2>
 
 One-class SVM은 다음과 같은 구도에서
@@ -150,23 +266,7 @@ outliers = [idx for idx, element in enumerate(novelty_scores) if element > thres
 print(outliers)
 ```
 
-
-
-<h4> 코드 설명 </h4>
-
-1. def closest_centroid_novelty_score(from_point, to_centroids): <br/>
-함수는 한 점과(from_point), k-means의 결과로써 나온 centroids(to_centroids)를 인풋으로 받습니다. <br/>
-from_point-to_centroids L2-norm을 바탕으로, from_point에서 각각의 centroid까지의 절대 거리를 구하여 쌓고, 그 중에서 최솟값을 찾아 novelty score로써 반환합니다.
-2. 1000개의 숫자데이터(각각이 pixels를 담고 있는 record)를 로드하고, k-means clustering 시킵니다. <br/>
-이 때, 숫자 라벨의 종류는 10가지(0~9) 이므로 총 10개의 clusters가 생기도록 합니다. <br/>
-각각의 데이터를 하나하나 looping하면서 각 데이터별, 10개의 centroids에 대한 novelty score을 계산하여 순서대로 쌓습니다.
-3. 누적된 novelty score을 뽑아보고 임의의 임계값을 정하여 outliers를 골라냅니다.
-
-
-
-
-
-<br><br><br><br/><br/><br/>
+<br/><br/><br/>
 <h2> SupportVector Data Description </h2>
 
 SVDD는 다음과 같은 구도에서
@@ -216,14 +316,3 @@ threshold = 9e-14
 outliers = [idx for idx, element in enumerate(novelty_scores) if element > threshold]
 print(outliers)
 ```
-
-
-
-<h4> 코드 설명 </h4>
-
-1. def reconstruction_loss_novelty_score(from_points, to_reconstructed_points): <br/>
-함수는 PCA를 하기 전 모든 데이터 포인트와(from_points), PCA를 수행한 후 다시 reconstruct한 모든 데이터 포인트(to_reconstructed_points)를 인풋으로 받습니다. <br/>
-from_points-to_reconstructed_points L2-norm을 바탕으로, from_points의 각 점에서 to_reconstructed_points의 각 점까지의 절대 거리를 구하여, novelty score로써 반환합니다.
-2. 100개의 숫자데이터(각각이 pixels를 담고 있는 record)를 로드하고, PCA와 reconstruction을 수행합니다. <br/>
-이어 데이터 포인트 전체와 reconstructed된 데이터 포인트 전체를 상기 함수에 feeding함으로써, 전체 데이터 포인트 각각의 요소에 corresponding하는 reconstructed 데이터 포인트에 대한 novelty score을 각각 계산합니다.
-3. novelty score을 뽑아보고 임의의 임계값을 정하여 outliers를 골라냅니다.
