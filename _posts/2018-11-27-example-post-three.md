@@ -30,6 +30,7 @@ Autoencoder는 크게 네 부분으로 나눌 수 있습니다. <br/>
 * bottleneck layer
  * de-mapping layer (=decoder)
 * output layer
+
 <br/>
   
 encoder에서는 input data를 bottleneck layer로 보냄으로써 input 정보를 저차원으로 압축시킵니다.  <br/>
