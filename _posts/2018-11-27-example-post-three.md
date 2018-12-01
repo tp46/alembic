@@ -50,7 +50,7 @@ Autoencoder의 이러한 reconstruction error는 데이터의 outlier를 잡아�
 
 
 <h4> 코드 </h4>
-<br/>
+
 
 ```python
 import os, sys
@@ -134,8 +134,7 @@ class Autoencoder():
         # Global step
         self.global_step = tf.train.get_or_create_global_step()
         # Optimizer
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(loss=self.loss,
-                                                                                           global_step=self.global_step)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(loss=self.loss, global_step=self.global_step)
         # Model saver
         self.saver = tf.train.Saver()
         return
