@@ -214,7 +214,7 @@ autoencoder.predict()
 ```
 <br/>
 
-위의 코드로 훈련시킨 autoencoder로 novelty detection을 한 결과는 다음과 같습니다.
+autoencoder로 novelty detection을 한 결과는 다음과 같습니다.
 <img src="/images/03_detection.png" width="1800" height="600" />
 
 
