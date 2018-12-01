@@ -45,11 +45,12 @@ Autoencoder의 이러한 reconstruction error는 데이터의 outlier를 잡아�
 즉, autoencoder는 훈련 과정에서 훈련 데이터와 똑같은 형태의 데이터를 예측하기 위해 훈련 데이터의 일반적인 특징을 배웠을 것입니다. <br/>
 그러므로, 일반적인 특징을 지닌 정상 데이터를 input으로 받았을 때는 이와 유사한 데이터를 쉽게 예측할 수 있으므로 reconstruction error가 낮은 반면, <br/>
 다른 데이터와는 상이한 특징을 지닌 outlier를 input으로 받았을 때는 이와 유사한 데이터를 예측하기 어려워 reconstruction error가 높을 것입니다. <br/>
-결국, reconstruction error가 특정 값보다 높은 경우에는 outlier, 그렇지 않은 경우에는 정상 데이터로 분류하는 방식으로 autoencoder를 통한 novelty detection을 구현할 수 있습니다. <br/>
+결국, reconstruction error가 특정 값보다 높은 경우에는 outlier, 그렇지 않은 경우에는 정상 데이터로 분류하는 방식으로 autoencoder를 통한 novelty detection을 구현할 수 있습니다.
 
 
-
+<br/><br/>
 <h4> 코드 </h4>
+<br/>
 
 
 ```python
