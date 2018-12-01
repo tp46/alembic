@@ -37,7 +37,7 @@ encoder에서는 input data를 bottleneck layer로 보냄으로써 input 정보�
 decoder에서는 압축된 형태의 input 정보를 원래의 input data로 복원하는 일을 수행합니다. <br/>
 
 앞서 언급했듯이, 이 모델의 목표는 input data와 똑같은 형태의 data를 예측하는 것입니다. <br/>
-따라서, output layer를 통해 나온 모델의 예측된 데이터와 실제 데이터의 차이(reconstruction error)를 loss function으로 정하고, 이 loss를 줄이는 방향으로 모델을 훈련시킵니다.
+따라서, output layer를 통해 나온 모델의 예측된 데이터와 실제 데이터의 차이를 loss function으로 정하고, 이 loss를 줄이는 방향으로 모델을 훈련시킵니다.
 <img src="/images/02_loss_function.png" width="1800" height="600" />
 <br/>
 
