@@ -14,9 +14,9 @@ use_math: true
 
 Novelty detection이란, 데이터에서 outlier를 잡아내는 것을 말하며, 이 글에서는 모델을 이용해 outlier를 잡아내는 것에 대해 다루고자 합니다. Novelty detection에 사용될 수 있는 대표적인 모델로는 다음과 같이 3가지를 들 수 있습니다.<br/>
 
-&nbsp;1. Autoencoder
-2. One-Class SVM & SVDD
-3. Isolation Forest
+* Autoencoder
+* One-Class SVM & SVDD
+* Isolation Forest
 
 <br/>
 <h2> Auto-Encoder for Novelty Detection </h2>
@@ -24,19 +24,22 @@ Novelty detection이란, 데이터에서 outlier를 잡아내는 것을 말하�
 Autoencoder는 neural network 모델의 한 종류이며, input data를 받았을 때 이와 똑같은 형태의 output data를 예측하는 것을 목적으로 합니다.  Autoencoder의 전체적인 모델 구조는 다음 사진과 같습니다.
 <img src="/images/01_model_structure.png" width="1800" height="600" />
 <br/>
+
 Autoencoder는 크게 네 부분으로 나눌 수 있습니다. <br/>
-&nbsp;1. mapping layer (= encoder) 
-2. bottleneck layer
- 3. de-mapping layer (=decoder)
-4. output layer
+* mapping layer (= encoder) 
+* bottleneck layer
+ * de-mapping layer (=decoder)
+* output layer
 <br/>
-  encoder에서는 input data를 bottleneck layer로 보냄으로써 input 정보를 저차원으로 압축시킵니다.  <br/>
-decoder에서는 압축된 형태의 input 정보를 원래의 input data로 복원하는 일을 수행합니다.<br/>
-<br/>
-앞서 언급했듯이, 이 모델의 목표는 input data와 똑같은 형태의 data를 예측하는 것입니다.<br/>
+  
+encoder에서는 input data를 bottleneck layer로 보냄으로써 input 정보를 저차원으로 압축시킵니다.  <br/>
+decoder에서는 압축된 형태의 input 정보를 원래의 input data로 복원하는 일을 수행합니다. <br/>
+
+앞서 언급했듯이, 이 모델의 목표는 input data와 똑같은 형태의 data를 예측하는 것입니다. <br/>
 따라서, output layer를 통해 나온 모델의 예측된 데이터와 실제 데이터의 차이(reconstruction error)를 loss function으로 정하고, 이 loss를 줄이는 방향으로 모델을 훈련시킵니다.
 <img src="/images/02_loss_function.png" width="1800" height="600" />
 <br/>
+
 Autoencoder의 이러한 reconstruction error는 데이터의 outlier를 잡아낼 때 사용될 수 있습니다. <br/>
 즉, autoencoder는 훈련 과정에서 훈련 데이터와 똑같은 형태의 데이터를 예측하기 위해 훈련 데이터의 일반적인 특징을 배웠을 것입니다. <br/>
 그러므로, 일반적인 특징을 지닌 정상 데이터를 input으로 받았을 때는 이와 유사한 데이터를 쉽게 예측할 수 있으므로 reconstruction error가 낮은 반면, <br/>
@@ -46,6 +49,7 @@ Autoencoder의 이러한 reconstruction error는 데이터의 outlier를 잡아�
 
 
 <h4> 코드 </h4>
+<br/>
 
 ```python
 import os, sys
@@ -207,6 +211,11 @@ class Autoencoder():
 autoencoder = Autoencoder('./model', 32, 0.01, 50, 500, 100)
 autoencoder.predict()
 ```
+<br/>
+
+위의 코드로 훈련시킨 autoencoder로 novelty detection을 한 결과는 다음과 같습니다.
+<img src="/images/03_detection.png" width="1800" height="600" />
+
 
 <br/><br/><br/>
 <h2> One-class SupportVector Machine </h2>
