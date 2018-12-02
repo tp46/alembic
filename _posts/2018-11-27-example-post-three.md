@@ -224,27 +224,27 @@ Auto-Encoder로 novelty detection을 한 결과는 다음과 같습니다.
 One-class SVM은 다음 사진처럼 원점으로부터 정상 데이터를 최대한 떨어져 있도록 하는 hyperplane을 찾는 SVM입니다. <br/>
 이에 따라, hyperplane 아래에 위치하면서 원점과 가까운 데이터는 outlier, hyperplane 위에 있는 데이터는 정상 데이터가 됩니다.
 <img src="/images/11_one_svm.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 One-class SVM의 수식은 다음과 같습니다.<br/>
 우선, SVM인만큼 margin을 최대화하는 기본적인 골조를 지닙니다.
 <img src="/images/12_one_svm.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 그러나 단순히 margin을 최대화할 경우, decision boundary가 원점에서부터 음 혹은 양의 방향으로 무한하게 발산할 것입니다. <br/>
 이를 해결하기 위하여, 다음 사진과 같이 decision boundary가 원점으로부터 양의 방향으로 최대한 멀어지라는 제약을 더해줍니다. <br/>
 이렇게 하면 음의 방향으로 발산하는 문제는 해결할 수 있지만 여전히 decision boundary가 양의 방향으로 무한하게 발산할 가능성이 존재합니다. <br/>
 즉, 첫 번째 사진에서 오른쪽 위로 무한하게 움직여 모든 데이터를 decision boundary 아래에 둘 가능성이 있다는 것입니다.
 <img src="/images/13_one_svm.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 이를 해결하기 위해, decision boundary 아래에 존재하는 샘플들에게 패널티를 가하고, 이 패널티가 최소화되도록 제약을 추가합니다. <br/>
 이 제약을 통해 모든 데이터를 decision boundary 아래에 두게 되는 상황을 방지할 수 있습니다.
 <img src="/images/14_one_svm.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 마지막으로, 라그랑제 제약 조건을 건 후, KKT 조건을 풉니다.
 <img src="/images/15_one_svm.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 그러면 다음과 같은 최적화 문제로 수렴됩니다.
 <img src="/images/16_one_svm.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 또한, 내적의 특성을 이용하여 kernel trick을 사용할 수도 있는데, 다차원 공간 매핑을 가능하게 해주는 대표적인 커널은 다음과 같습니다.<br/>
 
 * Polynomial kernel
@@ -258,22 +258,22 @@ One-class SVM의 수식은 다음과 같습니다.<br/>
 SVDD는 다음 사진처럼 정상 데이터를 감싸안을 수 있는 최소 크기의 hypersphere를 찾는 SVM입니다. <br/>
 이에 따라, hypersphere 밖에 있는 데이터는 outlier, hypersphere 안에 있는 데이터는 정상 데이터가 됩니다.
 <img src="/images/21_svdd.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 SVDD의 수식은 다음과 같습니다. <br/>
 margin 대신 원의 크기(반지름)를 최소화하는 기본적인 골조를 지닙니다.
 <img src="/images/22_svdd.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 그러나 단순히 원의 크기를 최소화할 경우, decision boundary가 작은 한 점으로 무한히 수렴해 버리고 말 것입니다. <br/>
 이를 해결하기 위하여, 다음 사진과 같이 decision boundary 밖에 존재하는 샘플들에게 패널티를 가하고, 이 패널티가 최소화되도록 제약을 추가합니다. <br/>
 이 제약을 통해 모든 데이터를 decision boundary 밖에 두는 상황을 방지할 수 있습니다.
 <img src="/images/23_svdd.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 마지막으로, 라그랑제 제약조건을 건 후, KKT 조건을 풉니다.
 <img src="/images/24_svdd.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 그러면 다음과 같은 최적화 문제로 수렴됩니다.
 <img src="/images/25_svdd.png" width="1800" height="600" />
-<br/>
+<br/><br/>
 또한, 내적의 특성을 이용하여 kernel trick을 사용할 수도 있는데, 다차원 공간 매핑을 가능하게 해주는 대표적인 커널은 One-class SVM에서처럼 다음과 같습니다.<br/>
 
 * Polynomial kernel
