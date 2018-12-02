@@ -483,5 +483,5 @@ Isolation forest로 novelty detection을 한 결과는 다음과 같습니다.
 
 <br/><br/><br/><br/><br/>
 <h3> 참고 자료 </h3>
-* 
-* 
+* 강필성, 2018년 2학기 Business Analytics 강의 자료
+* Ghafoori et al., 2016, Unsupervised Parameter Estimation for One-Class Support Vector Machines
