@@ -224,27 +224,33 @@ Auto-Encoder로 novelty detection을 한 결과는 다음과 같습니다.
 One-class SVM은 다음 사진처럼 원점으로부터 정상 데이터를 최대한 떨어져 있도록 하는 hyperplane을 찾는 SVM입니다. <br/>
 이에 따라, hyperplane 아래에 위치하면서 원점과 가까운 데이터는 outlier, hyperplane 위에 있는 데이터는 정상 데이터가 됩니다.
 <img src="/images/11_one_svm.png" width="1800" height="600" />
-<br/><br/>
+<br/>
+
 One-class SVM의 수식은 다음과 같습니다.<br/>
 우선, SVM인만큼 margin을 최대화하는 기본적인 골조를 지닙니다.
 <img src="/images/12_one_svm.png" width="1800" height="600" />
-<br/><br/>
+<br/>
+
 그러나 단순히 margin을 최대화할 경우, decision boundary가 원점에서부터 음 혹은 양의 방향으로 무한하게 발산할 것입니다. <br/>
 이를 해결하기 위하여, 다음 사진과 같이 decision boundary가 원점으로부터 양의 방향으로 최대한 멀어지라는 제약을 더해줍니다. <br/>
 이렇게 하면 음의 방향으로 발산하는 문제는 해결할 수 있지만 여전히 decision boundary가 양의 방향으로 무한하게 발산할 가능성이 존재합니다. <br/>
 즉, 첫 번째 사진에서 오른쪽 위로 무한하게 움직여 모든 데이터를 decision boundary 아래에 둘 가능성이 있다는 것입니다.
 <img src="/images/13_one_svm.png" width="1800" height="600" />
-<br/><br/>
+<br/>
+
 이를 해결하기 위해, decision boundary 아래에 존재하는 샘플들에게 패널티를 가하고, 이 패널티가 최소화되도록 제약을 추가합니다. <br/>
 이 제약을 통해 모든 데이터를 decision boundary 아래에 두게 되는 상황을 방지할 수 있습니다.
 <img src="/images/14_one_svm.png" width="1800" height="600" />
-<br/><br/>
+<br/>
+
 마지막으로, 라그랑제 제약 조건을 건 후, KKT 조건을 풉니다.
 <img src="/images/15_one_svm.png" width="1800" height="600" />
-<br/><br/>
+<br/>
+
 그러면 다음과 같은 최적화 문제로 수렴됩니다.
 <img src="/images/16_one_svm.png" width="1800" height="600" />
-<br/><br/>
+<br/>
+
 또한, 내적의 특성을 이용하여 kernel trick을 사용할 수도 있는데, 다차원 공간 매핑을 가능하게 해주는 대표적인 커널은 다음과 같습니다.<br/>
 
 * Polynomial kernel
@@ -337,7 +343,6 @@ class One_class_SVM():
         one_class_svm.fit(self.train_X)
         # Predict
         predicted_X = one_class_svm.predict(self.X)
-        # Set boundary
         max_X_1 = np.amax(self.X[:, 0])
         min_X_1 = np.amin(self.X[:, 0])
         max_X_2 = np.amax(self.X[:, 1])
@@ -366,3 +371,117 @@ polynomial kernel을 사용한 One-class SVM으로 novelty detection을 한 결�
 
 RBF kernel을 사용한 SVDD로 novelty detection을 한 결과는 다음과 같습니다.
 <img src="/images/26_detection.png" width="1800" height="600" />
+
+
+<br/><br/><br/>
+<h2> Isolation Forest </h2>
+
+Isolation tree는 주어진 데이터를 다른 데이터와 분리하는 과정을 통해 정상 데이터와 outlier를 분리합니다. <br/>
+한 데이터를 다른 데이터로부터 분리하는 방법으로는 그 데이터와 나머지 데이터 사이에 선(split)을 긋는 방식을 사용합니다. <br/>
+<br/>
+다음 사진의 왼쪽에 있는 정상 데이터의 경우, 다른 데이터들과 뭉쳐 있기 때문에, 다른 데이터들로부터 분리(isolate)시키기 위해서는 선을 여러 번 그어야 합니다.<br/>
+반면, 사진의 오른쪽에 있는 비정상 데이터의 경우, 다른 데이터들로부터 떨어져 있기 때문에, 적은 개수의 선을 이용하여 분리시킬 수 있습니다. <br/>
+결국, 한 데이터를 홀로 분리시키는 데 사용되는 선의 개수가 많을수록 정상 데이터에 가깝고, <br/>
+사용되는 선의 개수가 적을수록 outlier에 가까워집니다.
+<img src="/images/31_split.png" width="1800" height="600" />
+<br/>
+
+이렇게 각각의 데이터를 다른 데이터들로부터 분리시키는 과정은 하나의 isolation tree로 표현할 수 있습니다. <br/>
+그리고 이 분리 과정을 랜덤하게 여러 번 반복하면 isolation forest가 됩니다. <br/>
+이 때, 여러 번의 랜덤한 분리 과정에서 꾸준히 적은 선으로 분리되는 데이터는 outlier로 분류되고,
+꾸준히 많은 선으로 분리되는 데이터는 정상 데이터로 분류됩니다.<br/>
+즉, tree의 root에서 데이터의 terminal node까지의 평균 거리(= 분리하는 데 사용되는 선의 평균 개수)가 novelty score를 계산하는 데 사용이 됩니다.
+<img src="/images/32_isolation_forest.png" width="1800" height="600" />
+<br/>
+
+Isolation forest에서의 novelty score은 다음과 같습니다. <br/>
+E(h(x))는 isolation forest에서의 데이터 x의 평균 거리를 나타냅니다. <br/>
+결국, 선이 많이 필요한 정상 데이터의 경우 E(h(x))값이 높으며, 전체 novelty score은 낮아집니다. <br/>
+반대로 선이 적게 필요한 outlier의 경우 E(h(x))값이 낮으며, 전체 novelty score은 높아집니다.
+<img src="/images/33_score.png" width="1800" height="600" />
+<br/>
+
+
+<br/><br/>
+<h4> Isolation Forest 코드 </h4>
+<br/>
+
+
+```python
+import os, sys
+from matplotlib import pyplot as plt
+from sklearn import datasets
+from sklearn.ensemble import IsolationForest
+import numpy as np
+import ipdb as pdb
+
+
+
+class Isolation_forest():
+    def __init__(self, max_samples):
+        self.max_samples = max_samples
+        return
+
+    def __prepare_data(self):
+        ### Import dataset
+        # Take only 2 features from original 30-dimensional data
+        self.X = datasets.load_breast_cancer().data[:,:2]
+        # Change dtype into float32
+        self.X = self.X.astype(np.float32)
+
+        ### Shuffle data
+        np.random.shuffle(self.X)
+
+        ### Split data into train and test set
+        num_X = self.X.shape[0]
+        # Use 80% of data as train set
+        num_train_X = np.int(num_X*0.8)
+        self.train_X = self.X[:num_train_X, :]
+        return
+
+    # Plot normal and novel data
+    def __plot(self, predicted_X, x_coordinates, y_coordinates, anomaly_scores):
+        normal_data_idx = np.where(predicted_X == 1)
+        abnormal_data_idx = np.where(predicted_X == -1)
+        normal_data = self.X[normal_data_idx]
+        abnormal_data = self.X[abnormal_data_idx]
+        plt.contour(x_coordinates.reshape([50, 50]), y_coordinates.reshape([50, 50]), anomaly_scores.reshape([50, 50]), levels=[0], colors='red')
+        plt.contourf(x_coordinates.reshape([50, 50]), y_coordinates.reshape([50, 50]), anomaly_scores.reshape([50, 50]))
+        plt.scatter(normal_data[:, 0], normal_data[:, 1], c='b')
+        plt.scatter(abnormal_data[:, 0], abnormal_data[:, 1], c='r')
+        plt.show()
+        return
+
+    def run(self):
+        # Create data
+        self.__prepare_data()
+        isolation_forest = IsolationForest(max_samples=self.max_samples)
+        # Fit isolation forest
+        isolation_forest.fit(self.train_X)
+        # Predict
+        predicted_X = isolation_forest.predict(self.X)
+        max_X_1 = np.amax(self.X[:, 0])
+        min_X_1 = np.amin(self.X[:, 0])
+        max_X_2 = np.amax(self.X[:, 1])
+        min_X_2 = np.amin(self.X[:, 1])
+        x_coordinates = np.tile(np.linspace(min_X_1, max_X_1, 50), 50)
+        y_coordinates = np.repeat(np.linspace(min_X_2, max_X_2, 50), 50)
+        anomaly_scores = isolation_forest.decision_function(np.c_[x_coordinates, y_coordinates])
+        # Plot the result
+        self.__plot(predicted_X, x_coordinates, y_coordinates, anomaly_scores)
+        return
+
+# Detect novel data
+isolation_forest = Isolation_forest(100)
+isolation_forest.run()
+
+```
+<br/>
+
+Isolation forest로 novelty detection을 한 결과는 다음과 같습니다.
+<img src="/images/34_detection.png" width="1800" height="600" />
+
+<br/><br/><br/><br/><br/>
+<h3> 참고 자료 </h3>
+* 
+* 
