@@ -355,7 +355,7 @@ class One_class_SVM():
 
 ### Detect novel data
 # one class SVM using polynomial
-one_class_svm = One_class_SVM(0.1, "polynomial", 0.00001)
+one_class_svm = One_class_SVM(0.1, "poly", 0.00001)
 one_class_svm.run()
 # SVDD
 # RBF kernel을 사용할 경우, one class SVM과 SVDD는 동일한 문제(식)를 해결하게 된다고 합니다. (Ghafoori et al., 2016)
