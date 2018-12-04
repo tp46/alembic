@@ -22,6 +22,7 @@ Novelty detection이란, 데이터에서 outlier를 잡아내는 것을 말하�
 
 Auto-Encoder는 neural network 모델의 한 종류이며, input 데이터를 받았을 때 이와 똑같은 형태의 output 데이터를 예측하는 것을 목적으로 합니다.  Auto-Encoder의 전체적인 모델 구조는 다음 사진과 같습니다.
 <img src="/images/01_model_structure.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 85쪽 </h6>
 <br/>
 
 Auto-Encoder는 크게 네 부분으로 나눌 수 있습니다. <br/>
@@ -38,6 +39,7 @@ Decoder에서는 압축된 형태의 input 정보를 원래의 input 데이터�
 앞서 언급했듯이, 이 모델의 목표는 input 데이터와 똑같은 형태의 데이터를 예측하는 것입니다. <br/>
 따라서, output layer를 통해 나온 모델의 예측된 데이터와 실제 데이터의 차이를 loss function으로 정하고, 이 loss를 줄이는 방향으로 모델을 훈련시킵니다.
 <img src="/images/02_loss_function.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 79쪽 </h6>
 <br/>
 
 Auto-Encoder의 이러한 reconstruction error는 데이터의 outlier를 잡아낼 때 사용될 수 있습니다. <br/>
@@ -223,11 +225,13 @@ Auto-Encoder로 novelty detection을 한 결과는 다음과 같습니다.
 One-class SVM은 다음 사진처럼 원점으로부터 정상 데이터를 최대한 떨어져 있도록 하는 hyperplane을 찾는 SVM입니다. <br/>
 이에 따라, hyperplane 아래에 위치하면서 원점과 가까운 데이터는 outlier, hyperplane 위에 있는 데이터는 정상 데이터가 됩니다.
 <img src="/images/11_one_svm.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 87쪽 </h6>
 <br/>
 
 One-class SVM의 수식은 다음과 같습니다.<br/>
 우선, SVM인만큼 margin을 최대화하는 기본적인 골조를 지닙니다.
 <img src="/images/12_one_svm.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 88쪽 </h6>
 <br/>
 
 그러나 단순히 margin을 최대화할 경우, decision boundary가 원점에서부터 음 혹은 양의 방향으로 무한하게 발산할 것입니다. <br/>
@@ -235,19 +239,23 @@ One-class SVM의 수식은 다음과 같습니다.<br/>
 이렇게 하면 음의 방향으로 발산하는 문제는 해결할 수 있지만 여전히 decision boundary가 양의 방향으로 무한하게 발산할 가능성이 존재합니다. <br/>
 즉, 첫 번째 사진에서 오른쪽 위로 무한하게 움직여 모든 데이터를 decision boundary 아래에 둘 가능성이 있다는 것입니다.
 <img src="/images/13_one_svm.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 88쪽 </h6>
 <br/>
 
 이를 해결하기 위해, decision boundary 아래에 존재하는 샘플들에게 패널티를 가하고, 이 패널티가 최소화되도록 제약을 추가합니다. <br/>
 이 제약을 통해 모든 데이터를 decision boundary 아래에 두게 되는 상황을 방지할 수 있습니다.
 <img src="/images/14_one_svm.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 88쪽 </h6>
 <br/>
 
 마지막으로, 라그랑제 제약 조건을 건 후, KKT 조건을 풉니다.
 <img src="/images/15_one_svm.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 88쪽 </h6>
 <br/>
 
 그러면 다음과 같은 최적화 문제로 수렴됩니다.
 <img src="/images/16_one_svm.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 90쪽 </h6>
 <br/>
 
 또한, 내적의 특성을 이용하여 kernel trick을 사용할 수도 있는데, 다차원 공간 매핑을 가능하게 해주는 대표적인 커널은 다음과 같습니다.<br/>
@@ -263,21 +271,26 @@ One-class SVM의 수식은 다음과 같습니다.<br/>
 SVDD는 다음 사진처럼 정상 데이터를 감싸안을 수 있는 최소 크기의 hypersphere를 찾는 SVM입니다. <br/>
 이에 따라, hypersphere 밖에 있는 데이터는 outlier, hypersphere 안에 있는 데이터는 정상 데이터가 됩니다.
 <img src="/images/21_svdd.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 94쪽 </h6>
 <br/><br/>
 SVDD의 수식은 다음과 같습니다. <br/>
 margin 대신 원의 크기(반지름)를 최소화하는 기본적인 골조를 지닙니다.
 <img src="/images/22_svdd.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 95쪽 </h6>
 <br/><br/>
 그러나 단순히 원의 크기를 최소화할 경우, decision boundary가 작은 한 점으로 무한히 수렴해 버리고 말 것입니다. <br/>
 이를 해결하기 위하여, 다음 사진과 같이 decision boundary 밖에 존재하는 샘플들에게 패널티를 가하고, 이 패널티가 최소화되도록 제약을 추가합니다. <br/>
 이 제약을 통해 모든 데이터를 decision boundary 밖에 두는 상황을 방지할 수 있습니다.
 <img src="/images/23_svdd.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 95쪽 </h6>
 <br/><br/>
 마지막으로, 라그랑제 제약조건을 건 후, KKT 조건을 풉니다.
 <img src="/images/24_svdd.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 95쪽 </h6>
 <br/><br/>
 그러면 다음과 같은 최적화 문제로 수렴됩니다.
 <img src="/images/25_svdd.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 98쪽 </h6>
 <br/><br/>
 또한, 내적의 특성을 이용하여 kernel trick을 사용할 수도 있는데, 다차원 공간 매핑을 가능하게 해주는 대표적인 커널은 One-class SVM에서처럼 다음과 같습니다.<br/>
 
@@ -383,6 +396,7 @@ Isolation tree는 주어진 데이터를 다른 데이터와 분리하는 과정
 결국, 한 데이터를 홀로 분리시키는 데 사용되는 선의 개수가 많을수록 정상 데이터에 가깝고, <br/>
 사용되는 선의 개수가 적을수록 outlier에 가까워집니다.
 <img src="/images/31_split.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 103쪽 </h6>
 <br/>
 
 이렇게 각각의 데이터를 다른 데이터들로부터 분리시키는 과정은 하나의 isolation tree로 표현할 수 있습니다. <br/>
@@ -391,6 +405,7 @@ Isolation tree는 주어진 데이터를 다른 데이터와 분리하는 과정
 꾸준히 많은 선으로 분리되는 데이터는 정상 데이터로 분류됩니다.<br/>
 즉, tree의 root에서 데이터의 terminal node까지의 평균 거리(= 분리하는 데 사용되는 선의 평균 개수)가 novelty score를 계산하는 데 사용이 됩니다.
 <img src="/images/32_isolation_forest.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 104쪽 </h6>
 <br/>
 
 Isolation forest에서의 novelty score은 다음과 같습니다. <br/>
@@ -398,6 +413,7 @@ E(h(x))는 isolation forest에서의 데이터 x의 평균 거리를 나타냅�
 결국, 선이 많이 필요한 정상 데이터의 경우 E(h(x))값이 높으며, 전체 novelty score은 낮아집니다. <br/>
 반대로 선이 적게 필요한 outlier의 경우 E(h(x))값이 낮으며, 전체 novelty score은 높아집니다.
 <img src="/images/33_score.png" width="1800" height="600" />
+<h6> 출처: 강필성, 2018년 2학기 Business Analytics 강의 자료 106쪽 </h6>
 <br/>
 
 
