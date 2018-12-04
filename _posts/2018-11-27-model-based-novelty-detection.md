@@ -11,7 +11,7 @@ image: "https://picsum.photos/2560/600?image=733"
 use_math: true
 ---
 
-* 본 포스트는 고려대학교 강필성 교수님의 2018학년도 2학기 Business Analytics 강의를 바탕으로 작성되었습니다.
+* 본 포스트는 고려대학교 강필성 교수님의 2018년도 2학기 Business Analytics 강의를 바탕으로 작성되었습니다.
 
 Novelty detection이란, 데이터에서 outlier를 잡아내는 것을 말하며, 이 글에서는 모델을 이용해 outlier를 잡아내는 것에 대해 다루고자 합니다. Novelty detection에 사용될 수 있는 대표적인 모델로는 다음과 같이 3가지를 들 수 있습니다.<br/>
 
